@@ -1,4 +1,4 @@
-package course.work.pastebin.Entities;
+package course.work.pastebin.entities;
 
 import jakarta.persistence.*;
 
@@ -8,12 +8,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
+import lombok.Setter;
 
 @Entity
 @Table(name = "users")
 @Data
 public class User {
+
+    public User(String username, String email, String password, Role role) {
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+    public User() {}
+
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column(unique = true, nullable = false)
@@ -22,13 +33,14 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @ManyToMany()
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id")
-    )
-    private Set<Role> roles = new HashSet<>();
+    @Column(nullable = false)
+    private String password;
+
+    @Setter
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Paste> pastes = new ArrayList<>();
@@ -40,15 +52,6 @@ public class User {
     @PrePersist
     protected void onCreate() {
         this.createdDate = new Date();
-    }
-
-    public User(){}
-    public User(String username, String email, Set<Role> roles, Date createdDate, List<Paste> pastes) {
-        this.username = username;
-        this.email = email;
-        this.roles = roles;
-        this.createdDate = createdDate;
-        this.pastes = pastes;
     }
 
 }

@@ -1,4 +1,4 @@
-package course.work.pastebin.Entities;
+package course.work.pastebin.entities;
 
 import jakarta.persistence.*;
 import java.util.Date;
