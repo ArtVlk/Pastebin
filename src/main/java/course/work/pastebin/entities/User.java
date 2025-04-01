@@ -4,24 +4,17 @@ import jakarta.persistence.*;
 
 import java.util.Date;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-import lombok.Data;
-import lombok.Setter;
+
+import lombok.*;
 
 @Entity
 @Table(name = "users")
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
-
-    public User(String username, String email, String password, Role role) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
-    public User() {}
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -42,6 +35,7 @@ public class User {
     private Role role;
 
 
+    @Builder.Default
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Paste> pastes = new ArrayList<>();
 

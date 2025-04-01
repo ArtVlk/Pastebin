@@ -1,31 +1,61 @@
 package course.work.pastebin.controllers;
 
+import course.work.pastebin.entities.Role;
 import course.work.pastebin.entities.User;
 import course.work.pastebin.services.UserDetailServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class RegistrationController {
+    private final UserDetailServiceImpl userDetailServiceImpl;
+    private final PasswordEncoder passwordEncoder;
+
     @Autowired
-    UserDetailServiceImpl userDetailServiceImpl;
+    public RegistrationController(
+            UserDetailServiceImpl userDetailServiceImpl,
+            PasswordEncoder passwordEncoder // Добавьте параметр
+    ) {
+        this.userDetailServiceImpl = userDetailServiceImpl;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @GetMapping("/registration")
     public String registration() {return "registration";}
 
     @PostMapping("/registration")
-    public String addUser(User user, Model model) {
-        if (userDetailServiceImpl.addUser(user)) {
-            return "redirect:/login";
-        } else {
-            model.addAttribute("message", "User already exists");
-            return "registration";
+    public String addUser(
+            @RequestParam String username,
+            @RequestParam String password,
+            @RequestParam String email,
+            @RequestParam String role,
+            Model model
+    ) {
+        try {
+            Role userRole = Role.valueOf(role.toUpperCase());
+
+            User user = User.builder()
+                    .username(username)
+                    .password(passwordEncoder.encode(password)) // Кодируем пароль
+                    .email(email)
+                    .role(userRole)
+                    .build();
+
+            if (userDetailServiceImpl.addUser(user)) {
+                return "redirect:/login";
+            }
+            model.addAttribute("message", "Пользователь уже существует");
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("message", "Некорректная роль! Используйте ADMIN или USER");
         }
+        return "registration";
     }
 
     @GetMapping("/login")

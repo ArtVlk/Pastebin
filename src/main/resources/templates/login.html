@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>🔐 Вход в систему</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+        input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #bdc3c7;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+        }
+        button {
+            width: 100%;
+            padding: 1rem;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        .error-message {
+            color: #e74c3c;
+            padding: 0.8rem;
+            background: #fadbd8;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+        }
+        .error-message.active {
+            display: block;
+        }
+        .register-link {
+            text-align: center;
+            margin-top: 1.5rem;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>🔐 Авторизация</h1>
+
+    <!-- Сообщение об ошибке -->
+    <div class="error-message" th:classappend="${param.error} ? 'active' : ''">
+        Неверное имя пользователя или пароль!
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label for="username">👤 Имя пользователя</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+
+        <div class="form-group">
+            <label for="password">🔒 Пароль</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+
+        <button type="submit">Войти →</button>
+    </form>
+
+    <div class="register-link">
+        Нет аккаунта? <a href="/registration">Зарегистрироваться</a>
+    </div>
+</div>
+</body>
+</html>

@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>✨ Spring Security Example ✨</title>
+    <title>✨ Регистрация ✨</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -13,7 +13,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
         }
         .container {
             background: #ffffff;
@@ -34,16 +34,26 @@
             margin: 1rem 0 0.5rem;
             font-weight: bold;
             color: #555;
+            text-align: left;
         }
         input[type="text"],
         input[type="password"],
-        input[type="email"] {
+        input[type="email"],
+        select {
             width: 100%;
             padding: 0.7rem;
             margin-bottom: 1rem;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1rem;
+            box-sizing: border-box;
+        }
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 0.7rem center;
+            background-size: 1em;
         }
         input[type="submit"] {
             background-color: #4CAF50;
@@ -54,6 +64,7 @@
             font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            width: 100%;
         }
         input[type="submit"]:hover {
             background-color: #45a049;
@@ -62,9 +73,10 @@
             margin-bottom: 1rem;
             padding: 1rem;
             border-radius: 5px;
-            background-color: #e7f3fe;
-            color: #0d6efd;
+            background-color: #ffe7e7;
+            color: #dc3545;
             font-weight: bold;
+            border: 1px solid #ffc9c9;
         }
         .emoji {
             font-size: 1.5rem;
@@ -76,26 +88,33 @@
 <div class="container">
     <div class="emoji">👤🔒</div>
     <h1>Регистрация нового пользователя</h1>
+
+    <!-- Блок для вывода сообщений об ошибках -->
     <div th:if="${message}" class="message" th:text="${message}"></div>
+
     <form th:action="@{/registration}" method="post">
         <!-- Поле для имени пользователя -->
-        <label for="username">Имя пользователя 🧑‍💻:</label>
-        <input type="text" id="username" name="username" placeholder="Введите имя" required />
+        <label for="username">Имя пользователя 🧑💻:</label>
+        <input type="text" id="username" name="username" placeholder="Введите имя" required>
 
         <!-- Поле для почты -->
         <label for="email">Почта 📧:</label>
-        <input type="email" id="email" name="email" placeholder="Введите email" required />
+        <input type="email" id="email" name="email" placeholder="Введите email" required>
 
         <!-- Поле для пароля -->
         <label for="password">Пароль 🔐:</label>
-        <input type="password" id="password" name="password" placeholder="Введите пароль" required />
+        <input type="password" id="password" name="password" placeholder="Введите пароль" required>
 
-        <!-- Поле для роли -->
+        <!-- Выпадающий список для роли -->
         <label for="role">Роль 🛡️:</label>
-        <input type="text" id="role" name="role" placeholder="ADMIN или USER" required />
+        <select id="role" name="role" required>
+            <option value="" disabled selected>Выберите роль</option>
+            <option value="USER">Обычный пользователь</option>
+            <option value="ADMIN">Администратор</option>
+        </select>
 
         <!-- Кнопка отправки формы -->
-        <input type="submit" value="Зарегистрироваться ✅" />
+        <input type="submit" value="Зарегистрироваться ✅">
     </form>
 </div>
 </body>
