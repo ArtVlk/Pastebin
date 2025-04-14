@@ -23,7 +23,8 @@ public class SecurityConfig {
                                 "/login",
                                 "/logout",
                                 "/css/**",
-                                "/js/**"
+                                "/js/**",
+                                "/paste/**"
                         ).permitAll()
                         .requestMatchers("/delete/**", "/swagger-ui/**").hasRole("ADMIN")
                         .anyRequest().authenticated()

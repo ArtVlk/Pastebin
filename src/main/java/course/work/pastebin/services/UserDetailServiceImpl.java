@@ -27,8 +27,8 @@ public class UserDetailServiceImpl implements UserDetailsService {
     }
 
     public boolean addUser(User user) {
-        User userFromDB = userRepository.findByUsername(user.getUsername());
-        if (userFromDB != null) {
+        Optional<User> userFromDB = userRepository.findByUsername(user.getUsername());
+        if (userFromDB.isPresent()) {
             return false;
         }
 
@@ -39,16 +39,13 @@ public class UserDetailServiceImpl implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
-        if (user == null) {
-            throw new UsernameNotFoundException("Пользователь не найден: " + username);
-        }
-
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                mapRoles(user)
-        );
+        return userRepository.findByUsername(username)
+                .map(u -> new org.springframework.security.core.userdetails.User(
+                        u.getUsername(),
+                        u.getPassword(),
+                        mapRoles(u)
+                ))
+                .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + username));
     }
 
     private Collection<? extends GrantedAuthority> mapRoles(User user) {
