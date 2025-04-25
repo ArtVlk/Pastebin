@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Просмотр пасты</title>
@@ -24,7 +24,7 @@
 <body>
 <div class="container">
     <!-- Если у пасты есть заголовок, можно отобразить его -->
-    <h1 th:text="${paste.title != null} ? ${paste.title} : 'Паста'">Паста</h1>
+    <h1 th:text="${paste.title} ?: 'Паста'">Название пасты</h1>
     <p>Создана:
         <span th:text="${#dates.format(paste.creationDate, 'dd.MM.yyyy HH:mm:ss')}">Дата создания</span>
     </p>

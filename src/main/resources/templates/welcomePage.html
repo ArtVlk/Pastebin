@@ -114,11 +114,15 @@
     <div class="emoji">📋</div>
     <h1>Создание новой пасты</h1>
 
+
     <!-- Блок уведомлений -->
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
     <form th:action="@{/createPaste}" method="post" enctype="multipart/form-data">
+        <label for="pasteTitle">Название пасты 🏷️:</label>
+        <input type="text" id="pasteTitle" name="title" placeholder="Введите название пасты...">
+
         <!-- Поле для ввода текста -->
         <label for="pasteText">Введите текст 📝:</label>
         <textarea id="pasteText" name="pasteText" placeholder="Вставьте ваш текст здесь..."></textarea>

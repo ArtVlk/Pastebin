@@ -20,9 +20,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.io.IOException;
 
 @Controller
 public class PasteController {
@@ -36,10 +33,12 @@ public class PasteController {
     public String createPaste(
             @RequestParam("pasteText") String text,
             @RequestParam(value = "pasteFile", required = false) MultipartFile file,
+            @RequestParam(value = "title", required = false) String title,
             Authentication authentication,
             RedirectAttributes redirectAttrs
     ) {
         try {
+            System.out.println("Получено название: '" + title + "'");
             String username = authentication.getName();
             System.out.println(username);
             User user = userRepository.findByUsername(username)
@@ -50,7 +49,7 @@ public class PasteController {
                 content = new String(file.getBytes());
             }
 
-            Paste paste = pasteService.createPaste(content, user);
+            Paste paste = pasteService.createPaste(content, user, title);
 
             String fullUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/paste/view/")
@@ -67,6 +66,8 @@ public class PasteController {
 
         return "redirect:/";
     }
+
+
 
     @GetMapping("/paste/{slug}")
     public ResponseEntity<Resource> downloadPaste(@PathVariable String slug) {

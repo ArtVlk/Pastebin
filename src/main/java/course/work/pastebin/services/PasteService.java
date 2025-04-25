@@ -18,12 +18,17 @@ public class PasteService {
     private PasteRepository pasteRepository;
 
     @Transactional
-    public Paste createPaste(String content, User user) {
+    public Paste createPaste(String content, User user, String title) {
         String slug = UUID.randomUUID().toString();
         Date expirationDate = new Date(System.currentTimeMillis() + 3600 * 1000);
 
+        String finalTitle = (title == null || title.trim().isEmpty())
+                ? "Паста"
+                : title.trim();
+
         Paste paste = Paste.builder()
                 .slug(slug)
+                .title(title != null && !title.isEmpty() ? title : "Паста")
                 .content(content)
                 .expirationDate(expirationDate)
                 .accessType(AccessType.PUBLIC)
@@ -32,7 +37,6 @@ public class PasteService {
 
         return pasteRepository.save(paste);
     }
-
     @Transactional(readOnly = true)
     public Optional<Paste> getPasteBySlug(String slug) {
         return pasteRepository.findBySlug(slug)
