@@ -123,6 +123,12 @@
         <label for="pasteTitle">Название пасты 🏷️:</label>
         <input type="text" id="pasteTitle" name="title" placeholder="Введите название пасты...">
 
+        <label for="accessType">Уровень доступа 🔒:</label>
+        <select id="accessType" name="accessType" required>
+            <option value="PUBLIC">Публичная</option>
+            <option value="PRIVATE">Приватная</option>
+        </select>
+
         <!-- Поле для ввода текста -->
         <label for="pasteText">Введите текст 📝:</label>
         <textarea id="pasteText" name="pasteText" placeholder="Вставьте ваш текст здесь..."></textarea>
@@ -140,6 +146,43 @@
         Ваша ссылка доступна 1 час:
         <a th:href="${pasteLink}" th:text="${pasteLink}"></a>
     </div>
+
+    <!-- Блок с таблицей активных паст -->
+    <div th:if="${pastes != null and !#lists.isEmpty(pastes)}" style="margin-top:2rem;">
+        <h2>Ваши активные пасты</h2>
+        <table style="width:100%; border-collapse: collapse; text-align: left;">
+            <thead>
+            <tr>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Название</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Ссылка</th>
+                <th style="padding:8px; border-bottom:1px solid #ddd;">Осталось</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="paste : ${pastes}">
+                <!-- Название -->
+                <td style="padding:8px; border-bottom:1px solid #eee;"
+                    th:text="${paste.title}">Без названия</td>
+
+                <!-- Ссылка -->
+                <td style="padding:8px; border-bottom:1px solid #eee;">
+                    <a th:href="@{/paste/view/{slug}(slug=${paste.slug})}"
+                       th:text="@{/paste/view/{slug}(slug=${paste.slug})}">
+                        Ссылка
+                    </a>
+                </td>
+
+                <!-- Осталось времени (дескриптор data-expiration для JS) -->
+                <td class="time-left"
+                    style="padding:8px; border-bottom:1px solid #eee;"
+                    th:attr="data-expiration=${paste.expirationDate.time}">
+                    <!-- сюда JS подставит значение -->
+                    --
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
 </div>
 
 <!-- Анимация загрузки -->
@@ -147,5 +190,30 @@
     <div class="spinner"></div>
     <p>Создаем вашу пасту...</p>
 </div>
+
+<script th:inline="javascript">
+    // Функция форматирования в "Xч Yм"
+    function formatRemaining(ms) {
+        if (ms <= 0) return '—';
+        const totalSeconds = Math.floor(ms / 1000);
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        return hours + 'ч ' + minutes.toString().padStart(2, '0') + 'м';
+    }
+
+    // Обновление всех ячеек каждую секунду
+    function updateTimers() {
+        document.querySelectorAll('.time-left').forEach(cell => {
+            const expiration = parseInt(cell.getAttribute('data-expiration'), 10);
+            const remainingMs = expiration - Date.now();
+            cell.textContent = formatRemaining(remainingMs);
+        });
+    }
+
+    // Запустим сразу и потом каждую секунду
+    updateTimers();
+    setInterval(updateTimers, 1000);
+</script>
+
 </body>
 </html>

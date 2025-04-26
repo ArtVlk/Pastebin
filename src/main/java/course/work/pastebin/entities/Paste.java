@@ -25,7 +25,7 @@ public class Paste {
 
     private String title;
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     @Temporal(TemporalType.TIMESTAMP)

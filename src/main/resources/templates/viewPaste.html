@@ -4,31 +4,161 @@
     <meta charset="UTF-8">
     <title>Просмотр пасты</title>
     <style>
-        body { font-family: Arial, sans-serif; padding: 2rem; background: #f9f9f9; }
+        body {
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+            background: #f9f9f9;
+            margin: 0;
+        }
         .container {
             max-width: 800px;
-            margin: auto;
+            margin: 0 auto;
             background: #ffffff;
-            padding: 1rem;
+            padding: 2rem;
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         pre {
-            background: #eaeaea;
-            padding: 1rem;
-            border-radius: 4px;
+            background: #f5f5f5;
+            padding: 1.5rem;
+            border-radius: 6px;
             white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .paste-link {
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+        }
+        #pasteUrl {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .access-badge {
+            display: inline-block;
+            padding: 0.4rem 0.8rem;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        .access-private {
+            background-color: #ffe0e0;
+            color: #dc3545;
+        }
+        .access-public {
+            background-color: #e0ffe0;
+            color: #28a745;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.9rem;
+            margin-top: 1.5rem;
+        }
+        .timer {
+            color: #dc3545;
+            font-weight: 500;
+            margin: 1rem 0;
+        }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            margin: -1px;
+            padding: 0;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
         }
     </style>
 </head>
 <body>
 <div class="container">
-    <!-- Если у пасты есть заголовок, можно отобразить его -->
-    <h1 th:text="${paste.title} ?: 'Паста'">Название пасты</h1>
-    <p>Создана:
-        <span th:text="${#dates.format(paste.creationDate, 'dd.MM.yyyy HH:mm:ss')}">Дата создания</span>
-    </p>
-    <pre th:text="${paste.content}">Здесь будет содержимое пасты</pre>
+    <h1 th:text="${paste.title ?: 'Без названия'}"></h1>
+
+    <div th:if="${paste.accessType.name() == 'PRIVATE'}"
+         class="access-badge access-private">
+        🔒 Приватная паста
+    </div>
+    <div th:if="${paste.accessType.name() == 'PUBLIC'}"
+         class="access-badge access-public">
+        🌐 Публичная паста
+    </div>
+
+    <div class="paste-link">
+        <label for="pasteUrl" class="visually-hidden">Ссылка на пасту</label>
+        <input type="text"
+               id="pasteUrl"
+               th:value="${pasteUrl}"
+               readonly>
+        <button onclick="copyToClipboard()">📋 Копировать ссылку</button>
+    </div>
+
+    <pre th:text="${paste.content}"></pre>
+
+    <div class="timestamp">
+        Создана:
+        <span th:text="${#dates.format(paste.creationDate, 'dd.MM.yyyy HH:mm:ss')}"></span>
+    </div>
+
+    <div class="timer" id="timer"></div>
+
+    <script th:inline="javascript">
+        // Таймер удаления
+        const expirationDate = /*[[${paste.expirationDate?.time}]]*/ null;
+
+        function updateTimer() {
+            if (!expirationDate) return;
+
+            const now = Date.now();
+            const diff = expirationDate - now;
+
+            if (diff <= 0) {
+                document.getElementById('timer').textContent = 'Паста удалена!';
+                return;
+            }
+
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+            document.getElementById('timer').textContent =
+                `Осталось: ${hours}ч ${minutes.toString().padStart(2, '0')}м`;
+        }
+
+        if (expirationDate) {
+            setInterval(updateTimer, 1000);
+            updateTimer();
+        }
+    </script>
+
+    <script>
+        function copyToClipboard() {
+            const url = document.getElementById('pasteUrl').value;
+
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    alert('Ссылка скопирована в буфер обмена:\n' + url);
+                })
+                .catch(err => {
+                    console.error('Ошибка копирования:', err);
+                    alert('Не удалось скопировать ссылку');
+                });
+        }
+    </script>
 </div>
 </body>
 </html>

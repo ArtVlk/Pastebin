@@ -3,12 +3,14 @@ package course.work.pastebin.services;
 import course.work.pastebin.crud.repositories.PasteRepository;
 import course.work.pastebin.entities.AccessType;
 import course.work.pastebin.entities.Paste;
+import course.work.pastebin.entities.Role;
 import course.work.pastebin.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -18,20 +20,16 @@ public class PasteService {
     private PasteRepository pasteRepository;
 
     @Transactional
-    public Paste createPaste(String content, User user, String title) {
+    public Paste createPaste(String content, User user, String title, AccessType accessType) {
         String slug = UUID.randomUUID().toString();
         Date expirationDate = new Date(System.currentTimeMillis() + 3600 * 1000);
-
-        String finalTitle = (title == null || title.trim().isEmpty())
-                ? "Паста"
-                : title.trim();
 
         Paste paste = Paste.builder()
                 .slug(slug)
                 .title(title != null && !title.isEmpty() ? title : "Паста")
                 .content(content)
                 .expirationDate(expirationDate)
-                .accessType(AccessType.PUBLIC)
+                .accessType(accessType)
                 .user(user)
                 .build();
 
@@ -41,6 +39,24 @@ public class PasteService {
     public Optional<Paste> getPasteBySlug(String slug) {
         return pasteRepository.findBySlug(slug)
                 .filter(paste -> !paste.isExpired());
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Paste> getPasteForUser(String slug, User currentUser) {
+        return pasteRepository.findBySlug(slug)
+                .filter(paste -> !paste.isExpired())
+                .filter(paste -> hasAccess(paste, currentUser));
+    }
+
+    private boolean hasAccess(Paste paste, User currentUser) {
+        return paste.getAccessType() == AccessType.PUBLIC
+                || (currentUser != null && (currentUser.equals(paste.getUser())
+                || currentUser.getRole() == Role.ADMIN));
+    }
+
+    public List<Paste> getActivePastesByUser(User user) {
+        Date now = new Date();
+        return pasteRepository.findByUserAndExpirationDateAfterOrderByCreationDateDesc(user, now);
     }
 
 }

@@ -66,7 +66,7 @@ public class RegistrationController {
         return "login";
     }
 
-    @GetMapping("/welcome")
+    @GetMapping("/register-success")
     public String welcome(){
         return "welcomePage";
     }
