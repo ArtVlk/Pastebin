@@ -32,29 +32,49 @@
             color: #4CAF50;
         }
 
-        label {
+        .emoji {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .form-group label {
             display: block;
-            margin: 1rem 0 0.5rem;
+            margin-bottom: 0.5rem;
             font-weight: bold;
             color: #555;
         }
 
-        textarea {
+        .form-control {
             width: 100%;
-            height: 150px;
             padding: 0.7rem;
-            margin-bottom: 1rem;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        textarea.form-control {
+            height: 150px;
             resize: none;
         }
 
-        input[type="file"] {
+        .input-group {
             margin-bottom: 1rem;
         }
 
-        input[type="submit"] {
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .btn {
             background-color: #4CAF50;
             color: white;
             border: none;
@@ -63,20 +83,11 @@
             font-size: 1rem;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            width: 100%;
         }
 
-        input[type="submit"]:hover {
+        .btn:hover {
             background-color: #45a049;
-        }
-
-        .link-box {
-            margin-top: 1rem;
-            padding: 1rem;
-            border-radius: 5px;
-            background-color: #e7f3fe;
-            color: #0d6efd;
-            font-weight: bold;
-            word-break: break-all;
         }
 
         .alert {
@@ -95,6 +106,32 @@
             color: #721c24;
         }
 
+        .link-box {
+            margin-top: 1rem;
+            padding: 1rem;
+            border-radius: 5px;
+            background-color: #e7f3fe;
+            color: #0d6efd;
+            font-weight: bold;
+            word-break: break-all;
+        }
+
+        .paste-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+        }
+
+        .paste-table th, .paste-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .paste-table th {
+            background-color: #f8f9fa;
+        }
+
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -103,9 +140,25 @@
             height: 100%;
             background: rgba(255, 255, 255, 0.8);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
             z-index: 1000;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4CAF50;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -114,31 +167,41 @@
     <div class="emoji">📋</div>
     <h1>Создание новой пасты</h1>
 
-
     <!-- Блок уведомлений -->
     <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
     <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
 
     <form th:action="@{/createPaste}" method="post" enctype="multipart/form-data">
-        <label for="pasteTitle">Название пасты 🏷️:</label>
-        <input type="text" id="pasteTitle" name="title" placeholder="Введите название пасты...">
+        <!-- Основная информация -->
+        <div class="form-group">
+            <label for="pasteTitle">Название пасты 🏷️:</label>
+            <input type="text" id="pasteTitle" name="title" placeholder="Введите название пасты..." class="form-control">
+        </div>
 
-        <label for="accessType">Уровень доступа 🔒:</label>
-        <select id="accessType" name="accessType" required>
-            <option value="PUBLIC">Публичная</option>
-            <option value="PRIVATE">Приватная</option>
-        </select>
+        <div class="form-group">
+            <label for="accessType">Уровень доступа 🔒:</label>
+            <select id="accessType" name="accessType" class="form-control" required>
+                <option value="PUBLIC">Публичная</option>
+                <option value="PRIVATE">Приватная</option>
+            </select>
+        </div>
 
-        <!-- Поле для ввода текста -->
-        <label for="pasteText">Введите текст 📝:</label>
-        <textarea id="pasteText" name="pasteText" placeholder="Вставьте ваш текст здесь..."></textarea>
+        <!-- Блок содержимого -->
+        <div class="form-group">
+            <div class="input-group">
+                <label>Содержимое пасты 📝:</label>
+            </div>
 
-        <!-- Поле для загрузки файла -->
-        <label for="pasteFile">Или загрузите файл 📂:</label>
-        <input type="file" id="pasteFile" name="pasteFile" accept=".txt,text/plain" />
+            <textarea id="pasteText" name="pasteText" placeholder="Вставьте ваш текст здесь..." class="form-control"></textarea>
+
+            <div class="input-group">
+                <label for="pasteFile">Загрузить файл 📂:</label>
+                <input type="file" id="pasteFile" name="pasteFile" accept=".txt,text/plain" class="form-control">
+            </div>
+        </div>
 
         <!-- Кнопка отправки -->
-        <input type="submit" name="submit" value="Создать пасту ✅" />
+        <button type="submit" class="btn">Создать пасту ✅</button>
     </form>
 
     <!-- Блок с ссылкой на пасту -->
@@ -148,35 +211,27 @@
     </div>
 
     <!-- Блок с таблицей активных паст -->
-    <div th:if="${pastes != null and !#lists.isEmpty(pastes)}" style="margin-top:2rem;">
-        <h2>Ваши активные пасты</h2>
-        <table style="width:100%; border-collapse: collapse; text-align: left;">
+    <div th:if="${pastes != null and !#lists.isEmpty(pastes)}">
+        <h2 class="mt-4">Ваши активные пасты</h2>
+        <table class="paste-table">
             <thead>
             <tr>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Название</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Ссылка</th>
-                <th style="padding:8px; border-bottom:1px solid #ddd;">Осталось</th>
+                <th>Название</th>
+                <th>Ссылка</th>
+                <th>Осталось</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="paste : ${pastes}">
-                <!-- Название -->
-                <td style="padding:8px; border-bottom:1px solid #eee;"
-                    th:text="${paste.title}">Без названия</td>
-
-                <!-- Ссылка -->
-                <td style="padding:8px; border-bottom:1px solid #eee;">
+                <td th:text="${paste.title} ?: 'Без названия'">Без названия</td>
+                <td>
                     <a th:href="@{/paste/view/{slug}(slug=${paste.slug})}"
                        th:text="@{/paste/view/{slug}(slug=${paste.slug})}">
                         Ссылка
                     </a>
                 </td>
-
-                <!-- Осталось времени (дескриптор data-expiration для JS) -->
                 <td class="time-left"
-                    style="padding:8px; border-bottom:1px solid #eee;"
                     th:attr="data-expiration=${paste.expirationDate.time}">
-                    <!-- сюда JS подставит значение -->
                     --
                 </td>
             </tr>
@@ -214,6 +269,5 @@
     updateTimers();
     setInterval(updateTimers, 1000);
 </script>
-
 </body>
 </html>
