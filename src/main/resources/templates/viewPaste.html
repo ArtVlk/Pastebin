@@ -133,9 +133,9 @@
     <div class="paste-link">
         <label for="pasteUrl" class="visually-hidden">Ссылка на пасту</label>
         <input type="text" id="pasteUrl" th:value="${pasteUrl}" readonly>
-        <button onclick="copyToClipboard()">📋 Копировать ссылку</button>
+        <button onclick="copyToClipboard()">Копировать ссылку</button>
         <a th:href="@{/paste/{slug}(slug=${paste.slug})}"
-           class="btn download-btn">💾 Скачать файл</a>
+           class="btn download-btn">Скачать файл</a>
     </div>
 
 
@@ -156,7 +156,7 @@
             <button type="submit"
                     class="delete-btn"
                     sec:authorize="hasRole('ADMIN') or #authentication.name == paste.user.username">
-                ❌ Удалить пасту
+                Удалить пасту
             </button>
         </form>
     </div>

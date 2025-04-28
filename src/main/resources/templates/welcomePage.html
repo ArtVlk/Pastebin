@@ -174,12 +174,12 @@
     <form th:action="@{/createPaste}" method="post" enctype="multipart/form-data">
         <!-- Основная информация -->
         <div class="form-group">
-            <label for="pasteTitle">Название пасты 🏷️:</label>
+            <label for="pasteTitle">🏷️ Название пасты</label>
             <input type="text" id="pasteTitle" name="title" placeholder="Введите название пасты..." class="form-control">
         </div>
 
         <div class="form-group">
-            <label for="accessType">Уровень доступа 🔒:</label>
+            <label for="accessType">🔒 Уровень доступа</label>
             <select id="accessType" name="accessType" class="form-control" required>
                 <option value="PUBLIC">Публичная</option>
                 <option value="PRIVATE">Приватная</option>
@@ -189,19 +189,19 @@
         <!-- Блок содержимого -->
         <div class="form-group">
             <div class="input-group">
-                <label>Содержимое пасты 📝:</label>
+                <label>📝 Содержимое пасты</label>
             </div>
 
             <textarea id="pasteText" name="pasteText" placeholder="Вставьте ваш текст здесь..." class="form-control"></textarea>
 
             <div class="input-group">
-                <label for="pasteFile">Загрузить файл 📂:</label>
+                <label for="pasteFile">📂 Загрузить файл</label>
                 <input type="file" id="pasteFile" name="pasteFile" accept=".txt,text/plain" class="form-control">
             </div>
         </div>
 
         <!-- Кнопка отправки -->
-        <button type="submit" class="btn">Создать пасту ✅</button>
+        <button type="submit" class="btn">Создать пасту</button>
     </form>
 
     <!-- Блок с ссылкой на пасту -->

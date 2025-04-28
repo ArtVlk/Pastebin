@@ -104,26 +104,26 @@
 <body>
 <div class="container">
     <div class="emoji">👤🔒</div>
-    <h1>Регистрация нового пользователя</h1>
+    <h1>Регистрация</h1>
 
     <!-- Блок для вывода сообщений об ошибках -->
     <div th:if="${message}" class="message" th:text="${message}"></div>
 
     <form th:action="@{/registration}" method="post">
         <!-- Поле для имени пользователя -->
-        <label for="username">Имя пользователя 🧑💻:</label>
+        <label for="username">🧑 Имя пользователя</label>
         <input type="text" id="username" name="username" placeholder="Введите имя" required>
 
         <!-- Поле для почты -->
-        <label for="email">Почта 📧:</label>
+        <label for="email">📧 Почта</label>
         <input type="email" id="email" name="email" placeholder="Введите email" required>
 
         <!-- Поле для пароля -->
-        <label for="password">Пароль 🔐:</label>
+        <label for="password">🔐 Пароль</label>
         <input type="password" id="password" name="password" placeholder="Введите пароль" required>
 
         <!-- Выпадающий список для роли -->
-        <label for="role">Роль 🛡️:</label>
+        <label for="role">🛡️ Роль ️</label>
         <select id="role" name="role" required>
             <option value="" disabled selected>Выберите роль</option>
             <option value="USER">Обычный пользователь</option>
@@ -131,7 +131,7 @@
         </select>
 
         <!-- Кнопка отправки формы -->
-        <input type="submit" value="Зарегистрироваться ✅">
+        <input type="submit" value="Зарегистрироваться">
 
         <div class="login-link">
             Есть аккаунт? <a th:href="@{/login}">Войти</a>
