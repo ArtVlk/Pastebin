@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="ru">
 <head>
     <meta charset="UTF-8">
     <title>Просмотр пасты</title>
@@ -84,6 +86,35 @@
             clip: rect(0, 0, 0, 0);
             border: 0;
         }
+        .download-btn {
+            background: #2196F3;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            text-decoration: none; /* Убираем подчеркивание */
+            margin-left: 10px;
+            display: inline-flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .download-btn:hover {
+            background: #0d47a1;
+            text-decoration: none;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            margin-top: 1rem;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -101,12 +132,12 @@
 
     <div class="paste-link">
         <label for="pasteUrl" class="visually-hidden">Ссылка на пасту</label>
-        <input type="text"
-               id="pasteUrl"
-               th:value="${pasteUrl}"
-               readonly>
+        <input type="text" id="pasteUrl" th:value="${pasteUrl}" readonly>
         <button onclick="copyToClipboard()">📋 Копировать ссылку</button>
+        <a th:href="@{/paste/{slug}(slug=${paste.slug})}"
+           class="btn download-btn">💾 Скачать файл</a>
     </div>
+
 
     <pre th:text="${paste.content}"></pre>
 
@@ -116,6 +147,19 @@
     </div>
 
     <div class="timer" id="timer"></div>
+
+    <div class="action-buttons" sec:authorize="isAuthenticated()">
+        <form th:action="@{'/paste/' + ${paste.slug} + '/delete'}"
+              method="post">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <button type="submit"
+                    class="delete-btn"
+                    sec:authorize="hasRole('ADMIN') or #authentication.name == paste.user.username">
+                ❌ Удалить пасту
+            </button>
+        </form>
+    </div>
 
     <script th:inline="javascript">
         // Таймер удаления
@@ -137,11 +181,6 @@
 
             document.getElementById('timer').textContent =
                 `Осталось: ${hours}ч ${minutes.toString().padStart(2, '0')}м`;
-        }
-
-        if (expirationDate) {
-            setInterval(updateTimer, 1000);
-            updateTimer();
         }
     </script>
 

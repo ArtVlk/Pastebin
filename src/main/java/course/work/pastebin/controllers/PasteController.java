@@ -7,6 +7,7 @@ import course.work.pastebin.entities.User;
 import course.work.pastebin.services.PasteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
@@ -74,25 +76,6 @@ public class PasteController {
         return "access-denied";
     }
 
-
-    @GetMapping("/paste/{slug}")
-    public ResponseEntity<Resource> downloadPaste(@PathVariable String slug,
-                                                  Authentication authentication) {
-        User currentUser = authentication != null
-                ? userRepository.findByUsername(authentication.getName()).orElse(null)
-                : null;
-
-        return pasteService.getPasteForUser(slug, currentUser)
-                .map(paste -> {
-                    Resource resource = new ByteArrayResource(paste.getContent().getBytes());
-                    return ResponseEntity.ok()
-                            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=paste.txt")
-                            .contentType(MediaType.TEXT_PLAIN)
-                            .body(resource);
-                })
-                .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
-    }
-
     @GetMapping("/paste/view/{slug}")
     public String viewPaste(@PathVariable String slug,
                             Authentication authentication,
@@ -120,5 +103,61 @@ public class PasteController {
         return authentication != null
                 ? userRepository.findByUsername(authentication.getName()).orElse(null)
                 : null;
+    }
+
+    @GetMapping("/paste/{slug}")
+    public ResponseEntity<Resource> downloadPaste(@PathVariable String slug,
+                                                  Authentication authentication) {
+        User currentUser = authentication != null
+                ? userRepository.findByUsername(authentication.getName()).orElse(null)
+                : null;
+
+        return pasteService.getPasteForUser(slug, currentUser)
+                .map(paste -> {
+                    String fileName = generateFileName(paste.getTitle(), paste.getSlug());
+                    Resource resource = new ByteArrayResource(paste.getContent().getBytes());
+
+                    return ResponseEntity.ok()
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"")
+                            .contentType(MediaType.TEXT_PLAIN)
+                            .body(resource);
+                })
+                .orElse(ResponseEntity.status(HttpStatus.FORBIDDEN).build());
+    }
+
+    private String generateFileName(String title, String slug) {
+        String baseName = (title != null && !title.isEmpty())
+                ? title
+                : "paste_" + slug;
+
+        String normalized = baseName
+                .replaceAll("[^\\p{L}\\p{Nd}\\s-]", "")
+                .replaceAll("\\s+", "_")
+                .toLowerCase();
+
+        String fileName = URLEncoder.encode(normalized + ".txt", StandardCharsets.UTF_8)
+                .replace("+", "%20");
+
+        return fileName.startsWith(".")
+                ? "paste.txt"
+                : fileName;
+    }
+
+    @PostMapping("/paste/{slug}/delete")
+    public String deletePaste(@PathVariable String slug,
+                              Authentication authentication,
+                              RedirectAttributes redirectAttrs) {
+        User currentUser = getCurrentUser(authentication);
+
+        try {
+            pasteService.deletePaste(slug, currentUser);
+            redirectAttrs.addFlashAttribute("successMessage", "Паста успешно удалена");
+        } catch (AccessDeniedException e) {
+            redirectAttrs.addFlashAttribute("errorMessage", e.getMessage());
+        } catch (Exception e) {
+            redirectAttrs.addFlashAttribute("errorMessage", "Ошибка при удалении пасты");
+        }
+
+        return "redirect:/welcome";
     }
 }

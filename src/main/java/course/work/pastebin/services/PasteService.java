@@ -6,6 +6,8 @@ import course.work.pastebin.entities.Paste;
 import course.work.pastebin.entities.Role;
 import course.work.pastebin.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +54,23 @@ public class PasteService {
         return paste.getAccessType() == AccessType.PUBLIC
                 || (currentUser != null && (currentUser.equals(paste.getUser())
                 || currentUser.getRole() == Role.ADMIN));
+    }
+
+    @Transactional
+    public void deletePaste(String slug, User currentUser) {
+        Paste paste = pasteRepository.findBySlug(slug)
+                .orElseThrow(() -> new ResourceNotFoundException("Паста не найдена"));
+
+        if (!hasDeletePermission(paste, currentUser)) {
+            throw new AccessDeniedException("У вас нет прав на удаление этой пасты");
+        }
+
+        pasteRepository.delete(paste);
+    }
+
+    private boolean hasDeletePermission(Paste paste, User currentUser) {
+        return currentUser.getRole() == Role.ADMIN ||
+                paste.getUser().equals(currentUser);
     }
 
     public List<Paste> getActivePastesByUser(User user) {
