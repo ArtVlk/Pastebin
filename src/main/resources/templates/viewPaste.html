@@ -115,10 +115,29 @@
         .delete-btn:hover {
             background-color: #c82333;
         }
+        .back-btn {
+            display: inline-block;
+            background: #4CAF50;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 1.5rem;
+        }
+
+        .back-btn:hover {
+            background-color: #45a049;
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <a th:href="@{/welcome}" class="back-btn">← Назад</a>
+
     <h1 th:text="${paste.title ?: 'Без названия'}"></h1>
 
     <div th:if="${paste.accessType.name() == 'PRIVATE'}"

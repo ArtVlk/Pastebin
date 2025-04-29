@@ -6,6 +6,8 @@ import course.work.pastebin.entities.Paste;
 import course.work.pastebin.entities.Role;
 import course.work.pastebin.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -20,8 +22,10 @@ import java.util.UUID;
 public class PasteService {
     @Autowired
     private PasteRepository pasteRepository;
+    private static final String PASTES_CACHE = "pastes";
 
     @Transactional
+    @CacheEvict(value = {"pastes", "userPastes"}, allEntries = true)
     public Paste createPaste(String content, User user, String title, AccessType accessType) {
         String slug = UUID.randomUUID().toString();
         Date expirationDate = new Date(System.currentTimeMillis() + 3600 * 1000);
@@ -37,7 +41,9 @@ public class PasteService {
 
         return pasteRepository.save(paste);
     }
+
     @Transactional(readOnly = true)
+    @Cacheable(value = PASTES_CACHE, key = "#slug")
     public Optional<Paste> getPasteBySlug(String slug) {
         return pasteRepository.findBySlug(slug)
                 .filter(paste -> !paste.isExpired());
@@ -57,6 +63,7 @@ public class PasteService {
     }
 
     @Transactional
+    @CacheEvict(value = {PASTES_CACHE, "userPastes"}, key = "#slug")
     public void deletePaste(String slug, User currentUser) {
         Paste paste = pasteRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Паста не найдена"));
@@ -73,6 +80,7 @@ public class PasteService {
                 paste.getUser().equals(currentUser);
     }
 
+    @Cacheable(value = "userPastes", key = "#user.id")
     public List<Paste> getActivePastesByUser(User user) {
         Date now = new Date();
         return pasteRepository.findByUserAndExpirationDateAfterOrderByCreationDateDesc(user, now);
