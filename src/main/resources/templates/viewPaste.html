@@ -111,7 +111,6 @@
             transition: background-color 0.2s;
             margin-top: 1rem;
         }
-
         .delete-btn:hover {
             background-color: #c82333;
         }
@@ -128,15 +127,27 @@
             transition: background-color 0.2s ease;
             margin-top: 1.5rem;
         }
-
         .back-btn:hover {
             background-color: #45a049;
+        }
+        .timing-badge {
+            background: #e8f5e9;
+            color: #2e7d32;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+            margin: 1rem 0 0 0;
         }
     </style>
 </head>
 <body>
 <div class="container">
     <a th:href="@{/welcome}" class="back-btn">← Назад</a>
+
+    <div th:if="${createTimeMs != null}" class="timing-badge">
+        Время создания пасты: <span th:text="${createTimeMs}"></span> ms
+    </div>
 
     <h1 th:text="${paste.title ?: 'Без названия'}"></h1>
 

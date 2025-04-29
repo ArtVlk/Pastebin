@@ -27,6 +27,8 @@ public class PasteService {
     @Transactional
     @CacheEvict(value = {"pastes", "userPastes"}, allEntries = true)
     public Paste createPaste(String content, User user, String title, AccessType accessType) {
+        long start = System.nanoTime();
+
         String slug = UUID.randomUUID().toString();
         Date expirationDate = new Date(System.currentTimeMillis() + 3600 * 1000);
 
@@ -39,7 +41,14 @@ public class PasteService {
                 .user(user)
                 .build();
 
-        return pasteRepository.save(paste);
+        Paste saved = pasteRepository.save(paste);
+
+        long durationNs = System.nanoTime() - start;
+        long durationMs = durationNs / 1_000_000;
+
+        saved.setCreateTimeMs(durationMs);
+        return saved;
+
     }
 
     @Transactional(readOnly = true)
@@ -63,7 +72,7 @@ public class PasteService {
     }
 
     @Transactional
-    @CacheEvict(value = {PASTES_CACHE, "userPastes"}, key = "#slug")
+    @CacheEvict(value = "userPastes", key = "#currentUser.id")
     public void deletePaste(String slug, User currentUser) {
         Paste paste = pasteRepository.findBySlug(slug)
                 .orElseThrow(() -> new ResourceNotFoundException("Паста не найдена"));

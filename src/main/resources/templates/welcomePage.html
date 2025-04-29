@@ -15,7 +15,6 @@
             align-items: center;
             height: 100vh;
         }
-
         .container {
             background: #ffffff;
             padding: 2rem;
@@ -25,30 +24,25 @@
             max-width: 500px;
             text-align: center;
         }
-
         h1 {
             font-size: 1.5rem;
             margin-bottom: 1rem;
             color: #4CAF50;
         }
-
         .emoji {
             font-size: 2rem;
             margin-bottom: 1rem;
         }
-
         .form-group {
             margin-bottom: 1.5rem;
             text-align: left;
         }
-
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: bold;
             color: #555;
         }
-
         .form-control {
             width: 100%;
             padding: 0.7rem;
@@ -57,23 +51,19 @@
             font-size: 1rem;
             box-sizing: border-box;
         }
-
         textarea.form-control {
             height: 150px;
             resize: none;
         }
-
         .input-group {
             margin-bottom: 1rem;
         }
-
         .input-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: bold;
             color: #555;
         }
-
         .btn {
             background-color: #4CAF50;
             color: white;
@@ -85,27 +75,22 @@
             transition: background-color 0.3s ease;
             width: 100%;
         }
-
         .btn:hover {
             background-color: #45a049;
         }
-
         .alert {
             padding: 1rem;
             margin: 1rem 0;
             border-radius: 5px;
         }
-
         .alert-success {
             background-color: #d4edda;
             color: #155724;
         }
-
         .alert-danger {
             background-color: #f8d7da;
             color: #721c24;
         }
-
         .link-box {
             margin-top: 1rem;
             padding: 1rem;
@@ -115,23 +100,19 @@
             font-weight: bold;
             word-break: break-all;
         }
-
         .paste-table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 2rem;
         }
-
         .paste-table th, .paste-table td {
             padding: 0.75rem;
             text-align: left;
             border-bottom: 1px solid #ddd;
         }
-
         .paste-table th {
             background-color: #f8f9fa;
         }
-
         .loading-overlay {
             position: fixed;
             top: 0;
@@ -145,7 +126,6 @@
             justify-content: center;
             z-index: 1000;
         }
-
         .spinner {
             border: 4px solid #f3f3f3;
             border-top: 4px solid #4CAF50;
@@ -155,7 +135,10 @@
             animation: spin 1s linear infinite;
             margin-bottom: 1rem;
         }
-
+        .center-table {
+            margin-left: auto;
+            margin-right: auto;
+        }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
@@ -213,7 +196,7 @@
     <!-- Блок с таблицей активных паст -->
     <div th:if="${pastes != null and !#lists.isEmpty(pastes)}">
         <h2 class="mt-4">Ваши активные пасты</h2>
-        <table class="paste-table">
+        <table class="paste-table center-table">
             <thead>
             <tr>
                 <th>Название</th>

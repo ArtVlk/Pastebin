@@ -1,6 +1,8 @@
 package course.work.pastebin.entities;
 
 import jakarta.persistence.*;
+
+import java.io.Serializable;
 import java.util.Date;
 
 import lombok.AllArgsConstructor;
@@ -15,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Paste {
+public class Paste implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
@@ -42,6 +44,16 @@ public class Paste {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @Transient
+    private long createTimeMs;
+
+    public long getCreateTimeMs() {
+        return createTimeMs;
+    }
+    public void setCreateTimeMs(long createTimeMs) {
+        this.createTimeMs = createTimeMs;
+    }
 
     @PrePersist
     protected void onCreate() {

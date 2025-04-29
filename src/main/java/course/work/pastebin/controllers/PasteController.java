@@ -57,6 +57,7 @@ public class PasteController {
 
             Paste paste = pasteService.createPaste(content, user, title, accessType);
 
+
             String fullUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
                     .path("/paste/view/")
                     .path(paste.getSlug())
@@ -64,6 +65,7 @@ public class PasteController {
 
             System.out.println(fullUrl);
 
+            redirectAttrs.addFlashAttribute("createTimeMs", paste.getCreateTimeMs());
             return "redirect:/paste/view/" + paste.getSlug();
         } catch (Exception e) {
             redirectAttrs.addFlashAttribute("errorMessage", "Ошибка: " + e.getMessage());
