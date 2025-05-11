@@ -9,7 +9,5 @@ import java.util.Optional;
 
 @RepositoryRestResource
 public interface UserRepository extends CrudRepository<User, Long> {
-
-    @Cacheable(value = "users", key = "#username")
     Optional<User> findByUsername(String username);
 }

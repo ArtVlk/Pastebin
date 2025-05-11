@@ -1,6 +1,5 @@
 package course.work.pastebin.services;
 
-import course.work.pastebin.entities.Role;
 import course.work.pastebin.entities.User;
 import course.work.pastebin.crud.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,12 +17,10 @@ import java.util.*;
 public class UserDetailServiceImpl implements UserDetailsService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserDetailServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncode) {
+    public UserDetailServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncode;
     }
 
     public boolean addUser(User user) {
@@ -31,8 +28,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
         if (userFromDB.isPresent()) {
             return false;
         }
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
         return true;
     }
@@ -40,12 +35,16 @@ public class UserDetailServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return userRepository.findByUsername(username)
-                .map(u -> new org.springframework.security.core.userdetails.User(
-                        u.getUsername(),
-                        u.getPassword(),
-                        mapRoles(u)
-                ))
+                .map(u -> {
+                    System.out.println("Пользователь найден: " + u.getUsername());
+                    return new org.springframework.security.core.userdetails.User(
+                            u.getUsername(),
+                            u.getPassword(),
+                            mapRoles(u)
+                    );
+                })
                 .orElseThrow(() -> new UsernameNotFoundException("Пользователь не найден: " + username));
+
     }
 
     private Collection<? extends GrantedAuthority> mapRoles(User user) {

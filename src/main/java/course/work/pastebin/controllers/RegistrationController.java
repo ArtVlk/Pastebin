@@ -42,7 +42,7 @@ public class RegistrationController {
 
             User user = User.builder()
                     .username(username)
-                    .password(passwordEncoder.encode(password)) // Кодируем пароль
+                    .password(passwordEncoder.encode(password))
                     .email(email)
                     .role(userRole)
                     .build();

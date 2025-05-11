@@ -45,7 +45,7 @@ public class Paste implements Serializable {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @Transient
+    @Column(name = "create_time_ms")
     private long createTimeMs;
 
     public long getCreateTimeMs() {

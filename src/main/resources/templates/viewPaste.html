@@ -145,8 +145,8 @@
 <div class="container">
     <a th:href="@{/welcome}" class="back-btn">← Назад</a>
 
-    <div th:if="${createTimeMs != null}" class="timing-badge">
-        Время создания пасты: <span th:text="${createTimeMs}"></span> ms
+    <div th:if="${paste.createTimeMs > 0}" class="timing-badge">
+        Время создания пасты: <span th:text="${paste.createTimeMs}"></span> ms
     </div>
 
     <h1 th:text="${paste.title ?: 'Без названия'}"></h1>
@@ -183,11 +183,23 @@
               method="post">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-            <button type="submit"
-                    class="delete-btn"
-                    sec:authorize="hasRole('ADMIN') or #authentication.name == paste.user.username">
-                Удалить пасту
-            </button>
+            <div class="action-buttons">
+                <!-- Для админа -->
+                <form th:action="@{'/paste/' + ${paste.slug} + '/delete'}"
+                      method="post"
+                      sec:authorize="hasRole('ADMIN')">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="delete-btn">Удалить пасту</button>
+                </form>
+
+                <!-- Для владельца пасты -->
+                <form th:action="@{'/paste/' + ${paste.slug} + '/delete'}"
+                      method="post"
+                      th:if="${#authentication.name == paste.user.username}">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    <button type="submit" class="delete-btn">Удалить пасту</button>
+                </form>
+            </div>
         </form>
     </div>
 

@@ -13,10 +13,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class PasteService {
@@ -39,23 +36,17 @@ public class PasteService {
                 .expirationDate(expirationDate)
                 .accessType(accessType)
                 .user(user)
+                .createTimeMs(0L)
                 .build();
 
         Paste saved = pasteRepository.save(paste);
 
         long durationNs = System.nanoTime() - start;
         long durationMs = durationNs / 1_000_000;
-
         saved.setCreateTimeMs(durationMs);
-        return saved;
 
-    }
+        return pasteRepository.save(saved);
 
-    @Transactional(readOnly = true)
-    @Cacheable(value = PASTES_CACHE, key = "#slug")
-    public Optional<Paste> getPasteBySlug(String slug) {
-        return pasteRepository.findBySlug(slug)
-                .filter(paste -> !paste.isExpired());
     }
 
     @Transactional(readOnly = true)
@@ -86,7 +77,7 @@ public class PasteService {
 
     private boolean hasDeletePermission(Paste paste, User currentUser) {
         return currentUser.getRole() == Role.ADMIN ||
-                paste.getUser().equals(currentUser);
+                Objects.equals(paste.getUser().getId(), currentUser.getId());
     }
 
     @Cacheable(value = "userPastes", key = "#user.id")
